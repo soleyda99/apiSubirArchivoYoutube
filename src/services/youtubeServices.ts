@@ -1,9 +1,6 @@
 const { google } = require("googleapis");
 const fs = require("fs");
-const dotenv = require("dotenv");
-
-dotenv.config();
-import type { youtube_v3 } from "googleapis";
+require("dotenv").config();
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.CLIENT_ID,
@@ -13,7 +10,7 @@ const oauth2Client = new google.auth.OAuth2(
 
 oauth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 
-const youtube: youtube_v3.Youtube = google.youtube({
+const youtube = google.youtube({
   version: "v3",
   auth: oauth2Client,
 });
@@ -32,7 +29,7 @@ const uploadVideoToYouTube = async (
     media: { body: fs.createReadStream(filePath) },
   });
 
-  return response.data.id!;
+  return response.data.id;
 };
 
 module.exports = { uploadVideoToYouTube };

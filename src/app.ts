@@ -1,16 +1,18 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const videoRoutes = require("./routes/videoRoutes");
 const path = require("path");
+const videoRoutes = require("./routes/videoRoutes");
 
 dotenv.config();
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
-app.use("/static", express.static(path.join(__dirname, "../video")));
+
+// Para cualquier archivo estático si querés servirlo
+app.use("/static", express.static(path.join(__dirname, "../uploads")));
+
 app.use("/api/videos", videoRoutes);
 
 const PORT = process.env.PORT || 5000;

@@ -1,7 +1,10 @@
-const { Router } = require("express");
+const express = require("express");
+const router = express.Router();
+const multer = require("multer");
 const { uploadVideoController } = require("../controllers/videoController");
 
-const router = Router();
-router.post("/upload", uploadVideoController);
+const upload = multer({ dest: "uploads/" });
+
+router.post("/upload", upload.single("video"), uploadVideoController);
 
 module.exports = router;

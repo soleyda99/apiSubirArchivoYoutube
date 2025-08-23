@@ -1,29 +1,46 @@
-const fs = require("fs");
-const { uploadVideoToYouTube } = require("../services/youtubeServices");
-const { downloadFile } = require("../utils/downloadFile");
 import type { Request, Response } from "express";
 
-const uploadVideoController = async (req: Request, res: Response) => {
-  try {
-    const { title, description, video_url } = req.body;
+const fs = require("fs");
+const { uploadVideoToYouTube } = require("../services/youtubeServices");
 
-    if (!title || !description || !video_url) {
-      res.status(400).json({ error: "Missing parameters" });
-      return;
+interface MulterRequest extends Request {
+  file: {
+    path: string;
+    fieldname: string;
+    originalname: string;
+    encoding: string;
+    mimetype: string;
+    size: number;
+    destination: string;
+    filename: string;
+    buffer?: Buffer;
+  };
+}
+
+const uploadVideoController = async (req: MulterRequest, res: Response) => {
+  try {
+    const { title, description } = req.body;
+
+    if (!title || !description || !req.file) {
+      return res
+        .status(400)
+        .json({ error: "Missing parameters or video file" });
     }
 
-    const filePath = "./temp_video.mp4";
-    await downloadFile(video_url, filePath);
-
+    const filePath = req.file.path; // Multer guarda temporalmente
     const youtubeVideoId = await uploadVideoToYouTube(
       filePath,
       title,
       description
     );
 
-    fs.unlinkSync(filePath);
+    fs.unlinkSync(filePath); // borramos el archivo temporal
 
-    res.status(200).json({ status: true, youtubeVideoId });
+    res.status(200).json({
+      status: true,
+      videoId: youtubeVideoId,
+      url: `https://www.youtube.com/watch?v=${youtubeVideoId}`,
+    });
   } catch (error) {
     res.status(500).json({ error: "Error uploading video" });
   }
