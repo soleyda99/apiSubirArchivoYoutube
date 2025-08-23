@@ -23,9 +23,8 @@ const uploadVideoController = async (req: Request, res: Response) => {
 
     fs.unlinkSync(filePath);
 
-    res.status(200).json({ youtubeVideoId });
+    res.status(200).json({ status: true, youtubeVideoId });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Error uploading video" });
   }
 };
